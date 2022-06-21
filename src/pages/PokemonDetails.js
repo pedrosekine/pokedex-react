@@ -1,5 +1,13 @@
-import { Grid, ImageList, ImageListItem, Pagination, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import {
+  Button,
+  Divider,
+  Grid,
+  ImageList,
+  ImageListItem,
+  Pagination,
+  Typography,
+} from "@mui/material";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { UpperMenu } from "../components/UpperMenu";
 import styled from "styled-components";
@@ -13,6 +21,17 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Box, flexbox } from "@mui/system";
 import { getPokemonDetails } from "../services/getPokemonDetails";
+import { GlobalStateContext } from "../global/GlobalStateContext";
+
+const TitleContainer = styled.div`
+  display: flex;
+  width: 100vw;
+  justify-content: center;
+  align-items: center;
+`
+const TitlePokemon =styled.h1`
+  margin: 2rem 2rem;
+`
 
 const PokemonImages = styled.img`
   margin: 1rem;
@@ -33,15 +52,25 @@ const TesteHone = styled.h1``;
 export const PokemonDetails = () => {
   const [imageComponent, setimageComponent] = useState();
   const [stats, setStats] = useState([]);
-  const [types, setTypes] = useState([]);
-  const [pageCounter, setPageCounter] = useState(0)
+  const [typesComponent, setTypesComponent] = useState();
+  const [pageCounter, setPageCounter] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [movesState, setMovesState] = useState([]);
+  const [moveComponent, setMoveComponent] = useState();
 
+  const [details, setDetails] = useState({});
+  const [alreadyOnPokedex, setAlreadyOnPokedex] = useState(Boolean);
 
   const params = useParams();
 
   useEffect(() => {
     updatePokemonDetails();
+    // função para verificar se pokemon já está na pokedex 🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴
+    alreadyOnPokedexCheck();
   }, []);
+
+  const { states, setters } = useContext(GlobalStateContext);
+  const { setPokedex } = setters;
 
   const updatePokemonDetails = async () => {
     const response = await getPokemonDetails(params.name);
@@ -59,12 +88,18 @@ export const PokemonDetails = () => {
       types,
       weight,
     } = response;
-    
+    organizeDetails(response);
+
     defineImages(sprites);
     defineStats(stats);
     defineTypes(types);
-    setPageCounter(Math.ceil(moves.length/10))
-  
+    setPageCounter(Math.ceil(moves.length / 10));
+    setMovesState(moves);
+    movesComponentBuilder(currentPage, moves);
+  };
+
+  const organizeDetails = (data) => {
+    setDetails(data);
   };
 
   const defineImages = (sprites) => {
@@ -92,22 +127,96 @@ export const PokemonDetails = () => {
 
     setimageComponent(imageComponentConstruction);
   };
-  
+
   const defineTypes = (types) => {
-    setTypes(types);
-  }
+    const TypesComponentContruction = types.map((type) => {
+      console.log("type.name", type.type.name);
+      return <Typography>{type.type.name}</Typography>;
+    });
+    setTypesComponent(TypesComponentContruction);
+  };
 
   const defineStats = (stats) => {
     setStats(stats);
   };
-  
+
   const handleChangePage = (event, page) => {
-    console.log("entrou no changePage, testando pageCounter", pageCounter)
-  }
+    setCurrentPage(page);
+    movesComponentBuilder(page);
+    // console.log("entrou no changePage, testando pageCounter", page);
+  };
+
+  const movesComponentBuilder = (page, movesArgument) => {
+    if (!movesArgument) {
+      movesArgument = movesState;
+    }
+    const movesManipulation = movesArgument
+      .filter((move, index) => {
+        const upperLimit = page * 10;
+        const lowerLimit = upperLimit - 10;
+        if (lowerLimit <= index && index < upperLimit) {
+          return true;
+        }
+      })
+      .map((move) => {
+        return (
+          <Typography key={move.move.url} margin="0.5rem 0">
+            {move.move.name}
+          </Typography>
+        );
+      });
+    console.log("movesComponentBuilder", movesManipulation);
+    setMoveComponent(movesManipulation);
+  };
+
+  const handleAddToPokedex = () => {
+    // console.log("setters para entender", setters);
+    // console.log("states.pokedex para entender", states.pokedex);
+    setPokedex([...states.pokedex, details]);
+    setAlreadyOnPokedex(true);
+
+    // console.log("states para entender",states.pokedex)
+  };
+
+  const handleRemoveFromPokedex = () => {
+    const filteredPokedex = states.pokedex.filter((pokemon) => {
+      return pokemon.name !== params.name;
+    });
+
+    setPokedex(filteredPokedex);
+    setAlreadyOnPokedex(false);
+  };
+
+  const alreadyOnPokedexCheck = () => {
+    const arrayComparison = states.pokedex.filter((pokemon) => {
+      return pokemon.name === params.name;
+    });
+    if (arrayComparison.length !== 0) {
+      setAlreadyOnPokedex(true);
+    }
+  };
 
   return (
     <MainContainer>
       <UpperMenu />
+      <TitleContainer>
+        <TitlePokemon>{params.name}</TitlePokemon>
+        {!alreadyOnPokedex ? (
+          <Button variant="outlined" onClick={handleAddToPokedex} size="small">
+            Add to Pokedex
+          </Button>
+        ) : (
+          <Button
+            variant="outlined"
+            onClick={handleRemoveFromPokedex}
+            size="small"
+            color="error"
+          >
+            Remove From Pokedex
+          </Button>
+        )}
+      </TitleContainer>
+
       <Grid
         container
         spacing={2}
@@ -164,20 +273,28 @@ export const PokemonDetails = () => {
           <Box display="flex" flexDirection="column">
             <Paper
               sx={{
-                display: "flex",
-                justifyContent: "space-around",
                 padding: "1rem",
-                marginBottom: "1em",
+                margin: "1rem 0",
               }}
             >
-              {" "}
-              {types.length !== 0 ? (
-                <>
-                  <Typography>{types[0].type.name}</Typography>
-                  <Typography>{types[1].type.name}</Typography>
-                </>
-              ) : (
+              <Typography
+                textAlign="center"
+                variant="h5"
+                sx={{ marginBottom: "2rem" }}
+              >
+                Types
+              </Typography>
+              {!typesComponent ? (
                 "loading"
+              ) : (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-around",
+                  }}
+                >
+                  {typesComponent}
+                </Box>
               )}
             </Paper>
             <Paper
@@ -191,14 +308,22 @@ export const PokemonDetails = () => {
               <Typography variant="h5" marginBottom="1rem">
                 Moves
               </Typography>
-              <Typography>Move 1</Typography>
+              {!moveComponent ? <div>loading</div> : moveComponent}
+              {/* <Typography>Move 1</Typography>
               <Typography>Move 2</Typography>
               <Typography>Move 3</Typography>
               <Typography>Move 4</Typography>
               <Typography>Move 5</Typography>
-              <Typography>Move 6</Typography>
-              <Pagination onChange={handleChangePage} count={pageCounter} shape="rounded" sx={{margin: "4rem 0"}} />
-
+              <Typography>Move 6</Typography> */}
+              <Pagination
+                size="small"
+                onChange={handleChangePage}
+                count={pageCounter}
+                shape="rounded"
+                sx={{ margin: "4rem 0" }}
+                hideNextButton={true}
+                hidePrevButton={true}
+              />
             </Paper>
           </Box>
         </Grid>

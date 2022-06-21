@@ -5,11 +5,18 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { Grid } from "@mui/material";
+import { Grid, Stack } from "@mui/material";
 import { useNavigate } from "react-router";
 import { getPokemonDetails } from "../services/getPokemonDetails";
 
 import { GlobalStateContext } from "../global/GlobalStateContext";
+import styled from "styled-components";
+import { display } from "@mui/system";
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
 
 export const PokemonCard = (props) => {
   const [details, setDetails] = useState({});
@@ -78,9 +85,8 @@ export const PokemonCard = (props) => {
       return pokemon.name !== name;
     });
 
-    setPokedex(filteredPokedex)
+    setPokedex(filteredPokedex);
     setAlreadyOnPokedex(false);
-
   };
 
   for (const pokedexPokemon of states.pokedex) {
@@ -120,24 +126,34 @@ export const PokemonCard = (props) => {
           <Typography gutterBottom variant="h5" component="div">
             {capitalName}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ minHeight: "5rem" }}
+          >
             {bodyText ? bodyText : "loading"}
           </Typography>
         </CardContent>
         <CardActions>
-          {!alreadyOnPokedex ? (
-            <Button onClick={handleAddToPokedex} size="small">
-              Add to Pokedex
-            </Button>
-          ) : (
-            <Button onClick={handleRemoveFromPokedex} size="small" color="error">
-              Remove From Pokedex
-            </Button>
-          )}
+          <Stack direction="row" spacing={3} sx={{display:"flex", flexDirection: "row", width:"100%", justifyContent:"space-evenly", margin:"1rem 0"}}>
+            {!alreadyOnPokedex ? (
+              <Button onClick={handleAddToPokedex} size="small" sx={{height: "3.5rem"}}>
+                Add to Pokedex
+              </Button>
+            ) : (
+              <Button sx={{height: "3.5rem"}}
+                onClick={handleRemoveFromPokedex}
+                size="small"
+                color="error"
+              >
+                Remove From Pokedex
+              </Button>
+            )}
 
-          <Button onClick={goToDetails} size="small">
-            Pokemon Details
-          </Button>
+            <Button onClick={goToDetails} size="small">
+              Pokemon Details
+            </Button>
+          </Stack>
         </CardActions>
       </Card>
     </Grid>
