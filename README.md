@@ -39,7 +39,7 @@ Opens on http://localhost:3000. No API key needed: PokéAPI is public.
 
 ## Demo
 
-The original surge.sh deployment is offline.
+**Live:** https://pokedex-react-rho-seven.vercel.app (redeployed on Vercel in 2026; the original surge.sh deployment is gone).
 
 ## Known limitations
 
