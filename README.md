@@ -1,70 +1,50 @@
-# Getting Started with Create React App
+# Pokédex
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React single-page app for browsing Pokémon and keeping your own Pokédex, built on the public [PokéAPI](https://pokeapi.co/).
 
-## Available Scripts
+Built in June 2022 during the [Labenu](https://www.labenu.com.br/) full-stack web development bootcamp (module 4, front-end). The code is kept as it was delivered; only this README was added later. Commit messages and some identifiers are in Portuguese.
 
-In the project directory, you can run:
+## What it does
 
-### `npm start`
+- **Home**: paginated list of Pokémon cards, loaded from PokéAPI (20 per page).
+- **Add / remove**: add a Pokémon to your Pokédex (or remove it) from its card or its details page.
+- **Pokédex page**: the Pokémon you've added.
+- **Details page**: sprites, base stats in a table, types and moves for a single Pokémon.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+State is shared through React Context (`src/global/`), not persisted: a reload empties the Pokédex.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Stack
 
-### `npm test`
+React 18 (Create React App) · React Router 6 · Material UI 5 · styled-components · axios
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Project structure
 
-### `npm run build`
+```
+src/
+  pages/        Home, Pokedex, PokemonDetails
+  components/   PokemonCard, UpperMenu
+  services/     getPokemonList, getPokemonDetails (PokéAPI calls)
+  global/       GlobalState + context (caught Pokémon)
+  routes/       Router
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Run it locally
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+npm install
+npm start
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Opens on http://localhost:3000. No API key needed: PokéAPI is public.
 
-### `npm run eject`
+## Demo
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+The original surge.sh deployment is offline.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Known limitations
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Left as delivered, bootcamp-era code:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- The Pokédex lives in memory only (no `localStorage`).
+- Errors are reported with `alert()`, and some `console.log` calls remain.
+- The Create React App test files are the untouched defaults.
